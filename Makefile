@@ -1,14 +1,25 @@
-# препроцессор --> компиляция --> компоновка (или линковка).
+# gcc
+# препроцессор --> компиляция --> ассемблирование --> компоновка (aka линковка).
+
+# make
+# $@: the target filename.
+# $*: the target filename without the file extension.
+# $<: the first prerequisite filename.
+# $^: the filenames of all the prerequisites, separated by spaces, discard duplicates.
+# $+: similar to $^, but includes duplicates.
+# $?: the names of all prerequisites that are newer than the target, separated by spaces.
+
+.PHONY : all clean
 
 ifneq ($V,1)
 Q ?= @
 endif
 
-#DEBUG	= -g -O0
+#DEBUG	= -ggdb -O0 -v
 DEBUG	= -O3
-CC	= gcc -E
-INCLUDE	= -I/usr/local/include -I./
-CFLAGS	= $(DEBUG) -Wall $(INCLUDE) -Winline -pipe
+CC	= gcc
+INCLUDE	= -I/usr/local/include -I.
+CFLAGS	= -c -std=c99 $(DEBUG) -Wall $(INCLUDE) -Winline -pipe
 
 LDFLAGS	= -L/usr/local/lib
 LDLIBS    = -lwiringPi -lwiringPiDev -lpthread -lm -lcrypt -lrt
@@ -16,10 +27,9 @@ LDLIBS    = -lwiringPi -lwiringPiDev -lpthread -lm -lcrypt -lrt
 # Should not alter anything below this line
 ###############################################################################
 
-SRC	=	isr.c
-OBJ	=	$(SRC:.c=.o)
-
-BINS	=	$(SRC:.c=)
+SRC  := $(wildcard *.c)
+OBJS := $(SRC:.c=.o)
+BINS :=	$(SRC:.c=)
 
 all:	isr
 
@@ -27,24 +37,21 @@ all:	isr
 #	$Q echo "    $(BINS)" | fmt
 #	$Q echo ""
 
-isr:	isr.o
-	$Q echo [link] $< $@
-	$Q $(CC) -o $@ isr.o $(LDFLAGS) $(LDLIBS)
+isr:	$(OBJS)
+	$Q echo [link] $^ '-->' $@
+	$Q $(CC) $(OBJS) $(LDFLAGS) $(LDLIBS) -o $@
 
-c.o:
-	$Q echo [CC] $<
-	$Q $(CC) -c $(CFLAGS) $< -o $@
-
+%.o:    %.c
+	$Q echo [CC] $< '-->' $@
+	$Q $(CC) -I. -c $(CFLAGS) $< #-o $@
+			
 clean:
 	$Q echo "[Clean]"
-	$Q rm -f $(OBJ) *~ core tags $(BINS)
+	$Q rm -f $(OBJS) *~ core tags $(BINS)
 
-tags:	$(SRC)
-	$Q echo [ctags]
-	$Q ctags $(SRC)
+#tags:	$(SRC)
+#	$Q echo [ctags]
+#	$Q ctags $(SRC)
 
-depend:
-	makedepend -Y $(SRC)
-
-
-# DO NOT DELETE
+#depend:
+#	makedepend -Y $(SRC)
