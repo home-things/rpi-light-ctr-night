@@ -49,12 +49,8 @@
 static int hotWPin = 0; // wiringpi id
 static int coldWPin = 2; // wiringpi id
 
-int buttonState;             // the current reading from the input pin
-int lastButtonState = LOW;   // the previous reading from the input pin
+unsigned double hotUsage, coldUsage; // m3
 
-// the following variables are unsigned longs because the time, measured in
-// milliseconds, will quickly become a bigger number than can be stored in an int.
-unsigned long lastDebounceTime = 0;  // the last time the output pin was toggled
 unsigned long debounceDelay = 50;    // the debounce time; increase if the output flickers
 
 /*
@@ -70,20 +66,62 @@ void printTime () {
   printf("%s", s);
 }
 
-
+void onHotImpulse(void)
+{
+  hotUsage += 0.01;
+  printf("onHotImpulse: %f\n", hotUsage);
+}
 void onHotIrq (void) {
+  static bool state; // the current reading from the input pin
+  static bool lastButtonState = LOW; // the previous reading from the input pin
+  static unsigned long lastDebounceTime = 0; // the last time the output pin was toggled
+
   //++globalCounter [0] ;
   //digitalWrite(lightPin, digitalRead(pirSensPin));
   printTime();
   printf(" onHotIrq: %d\n", digitalRead(hotWPin));
+  debounceImpulse(onHotImpulse, hotWPin, state, lastButtonState, lastDebounceTime)
+}
 
+void onColdImpulse (void) {
+  coldUsage += 0.01;
+  printf("onColdImpulse: %f\n", coldUsage);
 }
 
 void onColdIrq (void) {
+  static bool state; // the current reading from the input pin
+  static bool lastButtonState = LOW; // the previous reading from the input pin
+  static unsigned long lastDebounceTime = 0; // the last time the output pin was toggled
+
   //++globalCounter [0] ;
   //digitalWrite(lightPin, digitalRead(pirSensPin));
   printTime();
   printf(" onColdIrq: %d\n", digitalRead(coldWPin));
+  debounceImpulse(onColdImpulse, coldWPin, state, lastButtonState, lastDebounceTime)
+}
+
+void loadUsage(unsigned double *hotUsage, unsigned double *coldUsage)
+{
+  FILE *fp = fopen("usage.txt", "r");
+  if (!fp)
+  {
+    perror("Usage file opening failed");
+    exit EXIT_FAILURE;
+  }
+
+  // int c;
+  // while ((c = fgetc(fp)) != EOF) {
+  //   putchar(c);
+  // }
+  fscanf(fp, "%f %f", hotUsage, coldUsage);
+
+  if (ferror(fp))
+  {
+    perror("I/O error when reading");
+    exit EXIT_FAILURE;
+  }
+
+  fclose(fp);
 }
 
 /*
@@ -94,6 +132,8 @@ void onColdIrq (void) {
 
 int main (void)
 {
+  loadUsage(&hotUsage, &coldUsage);
+
   printTime();
   printf("wiringPiSetup\n");
   wiringPiSetup ();
@@ -110,4 +150,38 @@ int main (void)
 	}
 
   return 0;
+}
+
+void debounceImpulse(void (*onImpulse)(void), unsigned int pin, bool *state, bool *lastButtonState, static long *lastDebounceTime) {
+  // read the state of the switch into a local variable:
+  bool reading = digitalRead(pin);
+
+  // check to see if you just pressed the button
+  // (i.e. the input went from LOW to HIGH), and you've waited long enough
+  // since the last press to ignore any noise:
+
+  // If the switch changed, due to noise or pressing:
+  if (reading != lastButtonState) {
+    // reset the debouncing timer
+    lastDebounceTime = millis();
+  }
+
+  if ((millis() - lastDebounceTime) > debounceDelay) {
+    // whatever the reading is at, it's been there for longer than the debounce
+    // delay, so take it as the actual current state:
+
+    // if the button state has changed:
+    if (reading != state) {
+      state = reading;
+
+      // only toggle the LED if the new button state is HIGH
+      if (state == HIGH) {
+        ledState = !ledState;
+        (*onImpulse)();
+      }
+    }
+  }
+
+  // save the reading. Next time through the loop, it'll be the lastButtonState:
+  lastButtonState = reading;
 }
