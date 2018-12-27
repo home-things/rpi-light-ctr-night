@@ -31,7 +31,7 @@ isr:	isr.o
 	$Q echo [link] $< $@
 	$Q $(CC) -o $@ isr.o $(LDFLAGS) $(LDLIBS)
 
-isr.o:
+c.o:
 	$Q echo [CC] $<
 	$Q $(CC) -c $(CFLAGS) $< -o $@
 
