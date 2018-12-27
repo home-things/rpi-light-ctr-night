@@ -80,7 +80,7 @@ void loadUsage(double *hotUsage, double *coldUsage)
   // while ((c = fgetc(fp)) != EOF) {
   //   putchar(c);
   // }
-  fscanf(fp, "%f %f", hotUsage, coldUsage);
+  fscanf(fp, "%fl %fl", hotUsage, coldUsage);
 
   if (ferror(fp))
   {
