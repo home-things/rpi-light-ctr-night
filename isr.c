@@ -15,7 +15,7 @@
 
 //static volatile int globalCounter [8] ;
 
-static unsigned int hotWPin = 0; // wiringpi id
+static unsigned int hotWPin = 0;  // wiringpi id
 static unsigned int coldWPin = 2; // wiringpi id
 
 double hotUsage, coldUsage; // m3
@@ -25,7 +25,7 @@ double hotUsage, coldUsage; // m3
  *********************************************************************************
  */
 
-void printTime (void)
+void printTime(void)
 {
   time_t t = time(NULL);
   struct tm *tm = localtime(&t);
@@ -39,10 +39,10 @@ void onHotImpulse(void)
   hotUsage += 0.01;
   printf("onHotImpulse: %f\n", hotUsage);
 }
-void onHotIrq (void)
+void onHotIrq(void)
 {
-  static bool_t state; // the current reading from the input pin
-  static bool_t lastButtonState = LOW; // the previous reading from the input pin
+  static bool_t state;                       // the current reading from the input pin
+  static bool_t lastButtonState = LOW;       // the previous reading from the input pin
   static unsigned long lastDebounceTime = 0; // the last time the output pin was toggled
 
   //++globalCounter [0] ;
@@ -52,16 +52,16 @@ void onHotIrq (void)
   debounceImpulse(onHotImpulse, hotWPin, &state, &lastButtonState, &lastDebounceTime);
 }
 
-void onColdImpulse (void)
+void onColdImpulse(void)
 {
   coldUsage += 0.01;
   printf("onColdImpulse: %f\n", coldUsage);
 }
 
-void onColdIrq (void)
+void onColdIrq(void)
 {
-  static bool_t state; // the current reading from the input pin
-  static bool_t lastButtonState = LOW; // the previous reading from the input pin
+  static bool_t state;                       // the current reading from the input pin
+  static bool_t lastButtonState = LOW;       // the previous reading from the input pin
   static unsigned long lastDebounceTime = 0; // the last time the output pin was toggled
 
   //++globalCounter [0] ;
@@ -101,24 +101,30 @@ void loadUsage(double *hotUsage, double *coldUsage)
  *********************************************************************************
  */
 
-int main (void)
+int main(int argc, char *argv[])
 {
+  printf("%s\n", argv[0]);
+
   loadUsage(&hotUsage, &coldUsage);
 
   printTime();
   printf("wiringPiSetup\n");
   wiringPiSetup();
 
+  pullUpDnControl(coldWPin, PUD_DOWN);
+  pullUpDnControl(hotWPin, PUD_DOWN);
+
   printf("wiringPiISR...\n");
-  wiringPiISR(hotWPin, INT_EDGE_FALLING, &onHotIrq) ;
-  wiringPiISR(coldWPin, INT_EDGE_FALLING, &onColdIrq) ;
+  wiringPiISR(hotWPin, INT_EDGE_FALLING, &onHotIrq);
+  wiringPiISR(coldWPin, INT_EDGE_FALLING, &onColdIrq);
 
   //printf (" Int on pin %d: Counter: %5d\n", pin, globalCounter [pin]) ;
-	printf("waiting...\n");
+  printf("waiting...\n");
 
-	for(;;) {
-		sleep(100000);
-	}
+  for (;;)
+  {
+    sleep(100000);
+  }
 
   return 0;
 }

@@ -1,5 +1,5 @@
 # gcc
-# препроцессор --> компиляция --> ассемблирование --> компоновка (aka линковка).
+# -c: препроцессор --> компиляция --> ассемблирование; -lm: --> компоновка (aka линковка).
 
 # make
 # $@: the target filename.
@@ -11,18 +11,14 @@
 
 .PHONY : all clean
 
-ifneq ($V,1)
-Q ?= @
-endif
-
 #DEBUG	= -ggdb -O0 -v
-DEBUG	= -O3
-CC	= gcc
+DEBUG	  = -O3
+CC	    = gcc
 INCLUDE	= -I/usr/local/include -I.
 CFLAGS	= -c -std=c99 $(DEBUG) -Wall $(INCLUDE) -Winline -pipe
 
 LDFLAGS	= -L/usr/local/lib
-LDLIBS    = -lwiringPi -lwiringPiDev -lpthread -lm -lcrypt -lrt
+LDLIBS  = -lwiringPi -lwiringPiDev -lpthread -lm -lcrypt -lrt
 
 # Should not alter anything below this line
 ###############################################################################
@@ -31,27 +27,30 @@ SRC  := $(wildcard *.c)
 OBJS := $(SRC:.c=.o)
 BINS :=	$(SRC:.c=)
 
-all:	isr
+all:		run
 
-#	$Q cat README.TXT
-#	$Q echo "    $(BINS)" | fmt
-#	$Q echo ""
+#	@cat README.TXT
+#	@echo "    $(BINS)" | fmt
+#	@echo ""
 
-isr:	$(OBJS)
-	$Q echo [link] $^ '-->' $@
-	$Q $(CC) $(OBJS) $(LDFLAGS) $(LDLIBS) -o $@
+run:		isr
+	./isr
+
+isr:		$(OBJS)
+	@echo [link] $^ '-->' $@
+	$(CC) $(OBJS) $(LDFLAGS) $(LDLIBS) -o $@
 
 %.o:    %.c
-	$Q echo [CC] $< '-->' $@
-	$Q $(CC) -I. -c $(CFLAGS) $< #-o $@
-			
+	@echo [CC] $< '-->' $@
+	$(CC) -I. -c $(CFLAGS) $< #-o $@
+
 clean:
-	$Q echo "[Clean]"
-	$Q rm -f $(OBJS) *~ core tags $(BINS)
+	@echo "[Clean]"
+	rm -f $(OBJS) *~ core tags $(BINS)
 
 #tags:	$(SRC)
-#	$Q echo [ctags]
-#	$Q ctags $(SRC)
+#	echo [ctags]
+#	ctags $(SRC)
 
 #depend:
 #	makedepend -Y $(SRC)
