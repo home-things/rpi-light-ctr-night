@@ -1,10 +1,18 @@
+#digitalRead, wiringPiISR, pullUpDnControl, wiringPiSetup
 #include <wiringPi.h>
+
+#std
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <time.h>
+
+#? ? ?
+#include <unistd.h>
+
+#dirname
+#include <libgen.h>
 
 #include "isr.h"
 #include "debounce.h"
@@ -73,7 +81,8 @@ void onColdIrq(void)
 
 void loadUsage(double *hotUsage, double *coldUsage)
 {
-  FILE *fp = fopen("usage.txt", "r");
+  string path = dirname(argv[0]);
+  FILE *fp = fopen(path + "usage.txt", "r");
   if (!fp)
   {
     perror("File opening failed: usage.txt");
@@ -103,7 +112,7 @@ void loadUsage(double *hotUsage, double *coldUsage)
 
 int main(int argc, char *argv[])
 {
-  printf("%s\n", argv[0]);
+  printf("%s\n", dirname(argv[0]));
 
   loadUsage(&hotUsage, &coldUsage);
 
