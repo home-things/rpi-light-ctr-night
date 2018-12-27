@@ -1,7 +1,7 @@
 #include "isr.h"
 unsigned long debounceDelay = 50; // the debounce time; increase if the output flickers
 
-void debounceImpulse(void (*onImpulse)(void), unsigned int pin, bool_t *state, bool_t *lastButtonState, long *lastDebounceTime)
+void debounceImpulse(void (*onImpulse)(void), unsigned int pin, bool_t *state, bool_t *lastButtonState, unsigned long *lastDebounceTime)
 {
   // read the state of the switch into a local variable:
   bool_t reading = digitalRead(pin);
