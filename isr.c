@@ -79,10 +79,9 @@ void onColdIrq(void)
   debounceImpulse(onColdImpulse, coldWPin, &state, &lastButtonState, &lastDebounceTime);
 }
 
-void loadUsage(double *hotUsage, double *coldUsage)
+void loadUsage(char *cwd, double *hotUsage, double *coldUsage)
 {
-  char *path = dirname(argv[0]);
-  FILE *fp = fopen(strcat(path, "/usage.txt"), "r");
+  FILE *fp = fopen(strcat(cwd, "/usage.txt"), "r");
   if (!fp)
   {
     perror("File opening failed: usage.txt");
@@ -114,7 +113,8 @@ int main(int argc, char *argv[])
 {
   printf("%s\n", dirname(argv[0]));
 
-  loadUsage(&hotUsage, &coldUsage);
+  char *cwd = dirname(argv[0]);
+  loadUsage(cwd, &hotUsage, &coldUsage);
 
   printTime();
   printf("wiringPiSetup\n");
