@@ -46,6 +46,8 @@
 
 //static volatile int globalCounter [8] ;
 
+typedef unsigned char bool;
+
 static int hotWPin = 0; // wiringpi id
 static int coldWPin = 2; // wiringpi id
 
