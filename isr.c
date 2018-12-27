@@ -62,10 +62,19 @@ unsigned long debounceDelay = 50;    // the debounce time; increase if the outpu
  *********************************************************************************
  */
 
+void printTime () {
+  time_t t = time(NULL);
+  struct tm *tm = localtime(&t);
+  char s[64];
+  strftime(s, sizeof(s), "%c", tm);
+  printf("%s", s);
+}
+
+
 void onHotIrq (void) {
   //++globalCounter [0] ;
   //digitalWrite(lightPin, digitalRead(pirSensPin));
-  print_time();
+  printTime();
   printf(" onHotIrq: %d\n", digitalRead(hotWPin));
 
 }
@@ -73,7 +82,7 @@ void onHotIrq (void) {
 void onColdIrq (void) {
   //++globalCounter [0] ;
   //digitalWrite(lightPin, digitalRead(pirSensPin));
-  print_time();
+  printTime();
   printf(" onColdIrq: %d\n", digitalRead(coldWPin));
 }
 
@@ -85,7 +94,7 @@ void onColdIrq (void) {
 
 int main (void)
 {
-  print_time();
+  printTime();
   printf("wiringPiSetup\n");
   wiringPiSetup ();
 
@@ -101,12 +110,4 @@ int main (void)
 	}
 
   return 0;
-}
-
-void print_time () {
-  time_t t = time(NULL);
-  struct tm *tm = localtime(&t);
-  char s[64];
-  strftime(s, sizeof(s), "%c", tm);
-  printf("%s", s);
 }
