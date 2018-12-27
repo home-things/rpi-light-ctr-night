@@ -65,16 +65,16 @@ unsigned long debounceDelay = 50;    // the debounce time; increase if the outpu
 void onHotIrq (void) {
   //++globalCounter [0] ;
   //digitalWrite(lightPin, digitalRead(pirSensPin));
-  //printf("%d-%d-%d %d:%d:%d ", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
-  printf("onHotIrq: %d\n", digitalRead(hotWPin));
+  print_time();
+  printf(" onHotIrq: %d\n", digitalRead(hotWPin));
 
 }
 
 void onColdIrq (void) {
   //++globalCounter [0] ;
   //digitalWrite(lightPin, digitalRead(pirSensPin));
-  //printf("%d-%d-%d %d:%d:%d ", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
-  printf("onColdIrq: %d\n", digitalRead(coldWPin));
+  print_time();
+  printf(" onColdIrq: %d\n", digitalRead(coldWPin));
 }
 
 /*
@@ -85,14 +85,7 @@ void onColdIrq (void) {
 
 int main (void)
 {
-  time_t t = time(NULL);
-  struct tm *tm = localtime(&t);
-  char s[64];
-  strftime(s, sizeof(s), "%c", tm);
-  printf("%s\n", s);
-
-
-
+  print_time();
   printf("wiringPiSetup\n");
   wiringPiSetup ();
 
@@ -108,4 +101,12 @@ int main (void)
 	}
 
   return 0;
+}
+
+void print_time () {
+  time_t t = time(NULL);
+  struct tm *tm = localtime(&t);
+  char s[64];
+  strftime(s, sizeof(s), "%c", tm);
+  printf("%s", s);
 }
