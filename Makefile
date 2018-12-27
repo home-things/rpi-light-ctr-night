@@ -51,7 +51,7 @@ all:	isr
 
 isr:	isr.o
 	$Q echo [link]
-	$Q $(CC) -o $@ isr.o $(LDFLAGS) $(LDLIBS)
+	$Q $(CC) -c $(INCLUDE) -o $@ isr.o $(LDFLAGS) $(LDLIBS)
 
 .c.o:
 	$Q echo [CC] $<
