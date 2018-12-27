@@ -49,7 +49,7 @@
 static int hotWPin = 0; // wiringpi id
 static int coldWPin = 2; // wiringpi id
 
-unsigned double hotUsage, coldUsage; // m3
+double hotUsage, coldUsage; // m3
 
 unsigned long debounceDelay = 50;    // the debounce time; increase if the output flickers
 
@@ -100,7 +100,7 @@ void onColdIrq (void) {
   debounceImpulse(onColdImpulse, coldWPin, state, lastButtonState, lastDebounceTime)
 }
 
-void loadUsage(unsigned double *hotUsage, unsigned double *coldUsage)
+void loadUsage(double *hotUsage, double *coldUsage)
 {
   FILE *fp = fopen("usage.txt", "r");
   if (!fp)
