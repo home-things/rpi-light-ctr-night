@@ -37,15 +37,10 @@
 #include <stdlib.h>
 #include <wiringPi.h>
 #include <unistd.h>
+
+#include <iostream>
+#include <iomanip>
 #include <time.h>
-
-const time_t t = time(NULL);
-struct tm *tm = localtime(&t);
-char s[64];
-strftime(s, sizeof(s), "%c", tm);
-printf("%s\n", s);
-
-
 
 
 // globalCounter:
@@ -93,6 +88,14 @@ void onColdIrq (void) {
 
 int main (void)
 {
+  time_t t = time(NULL);
+  struct tm *tm = localtime(&t);
+  char s[64];
+  strftime(s, sizeof(s), "%c", tm);
+  printf("%s\n", s);
+
+
+
   printf("wiringPiSetup\n");
   wiringPiSetup ();
 
