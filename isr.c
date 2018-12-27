@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <time.h>
 
+#include "isr.h"
 #include "debounce.h"
 
 // globalCounter:

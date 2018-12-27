@@ -1,7 +1,4 @@
-typedef unsigned char bool;
-#define HIGH 1
-#define LOW 0
-
+#include "isr.h"
 unsigned long debounceDelay = 50; // the debounce time; increase if the output flickers
 
 void debounceImpulse(void (*onImpulse)(void), unsigned int pin, bool *state, bool *lastButtonState, long *lastDebounceTime)
