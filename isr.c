@@ -15,8 +15,8 @@
 
 //static volatile int globalCounter [8] ;
 
-unsigned hotWPin = 0; // wiringpi id
-unsigned coldWPin = 2; // wiringpi id
+unsigned int hotWPin = 0; // wiringpi id
+unsigned int coldWPin = 2; // wiringpi id
 
 double hotUsage, coldUsage; // m3
 
@@ -25,7 +25,8 @@ double hotUsage, coldUsage; // m3
  *********************************************************************************
  */
 
-void printTime () {
+void printTime (void)
+{
   time_t t = time(NULL);
   struct tm *tm = localtime(&t);
   char s[64];
@@ -38,7 +39,8 @@ void onHotImpulse(void)
   hotUsage += 0.01;
   printf("onHotImpulse: %f\n", hotUsage);
 }
-void onHotIrq (void) {
+void onHotIrq (void)
+{
   static bool_t state; // the current reading from the input pin
   static bool_t lastButtonState = LOW; // the previous reading from the input pin
   static unsigned long lastDebounceTime = 0; // the last time the output pin was toggled
@@ -50,12 +52,14 @@ void onHotIrq (void) {
   debounceImpulse(onHotImpulse, hotWPin, state, lastButtonState, lastDebounceTime);
 }
 
-void onColdImpulse (void) {
+void onColdImpulse (void)
+{
   coldUsage += 0.01;
   printf("onColdImpulse: %f\n", coldUsage);
 }
 
-void onColdIrq (void) {
+void onColdIrq (void)
+{
   static bool_t state; // the current reading from the input pin
   static bool_t lastButtonState = LOW; // the previous reading from the input pin
   static unsigned long lastDebounceTime = 0; // the last time the output pin was toggled
@@ -103,11 +107,11 @@ int main (void)
 
   printTime();
   printf("wiringPiSetup\n");
-  wiringPiSetup ();
+  wiringPiSetup();
 
   printf("wiringPiISR...\n");
-  wiringPiISR (hotWPin, INT_EDGE_FALLING, &onHotIrq) ;
-  wiringPiISR (coldWPin, INT_EDGE_FALLING, &onColdIrq) ;
+  wiringPiISR(hotWPin, INT_EDGE_FALLING, &onHotIrq) ;
+  wiringPiISR(coldWPin, INT_EDGE_FALLING, &onColdIrq) ;
 
   //printf (" Int on pin %d: Counter: %5d\n", pin, globalCounter [pin]) ;
 	printf("waiting...\n");
