@@ -81,8 +81,8 @@ void onColdIrq(void)
 
 void loadUsage(double *hotUsage, double *coldUsage)
 {
-  string path = dirname(argv[0]);
-  FILE *fp = fopen(path + "usage.txt", "r");
+  char *path = dirname(argv[0]);
+  FILE *fp = fopen(strcat(path, "/usage.txt"), "r");
   if (!fp)
   {
     perror("File opening failed: usage.txt");
