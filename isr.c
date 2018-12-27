@@ -1,44 +1,12 @@
-/*
- * isr.c:
- *	Wait for Interrupt test program - ISR method
- *
- *	How to test:
- *	  Use the SoC's pull-up and pull down resistors that are avalable
- *	on input pins. So compile & run this program (via sudo), then
- *	in another terminal:
- *		gpio mode 0 up
- *		gpio mode 0 down
- *	at which point it should trigger an interrupt. Toggle the pin
- *	up/down to generate more interrupts to test.
- *
- * Copyright (c) 2013 Gordon Henderson.
- ***********************************************************************
- * This file is part of wiringPi:
- *	https://projects.drogon.net/raspberry-pi/wiringpi/
- *
- *    wiringPi is free software: you can redistribute it and/or modify
- *    it under the terms of the GNU Lesser General Public License as published by
- *    the Free Software Foundation, either version 3 of the License, or
- *    (at your option) any later version.
- *
- *    wiringPi is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *    GNU Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public License
- *    along with wiringPi.  If not, see <http://www.gnu.org/licenses/>.
- ***********************************************************************
- */
-
+#include <wiringPi.h>
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
 #include <stdlib.h>
-#include <wiringPi.h>
 #include <unistd.h>
 #include <time.h>
 
+#include "debounce.h"
 
 // globalCounter:
 //	Global variable to count interrupts
@@ -52,8 +20,6 @@ static int hotWPin = 0; // wiringpi id
 static int coldWPin = 2; // wiringpi id
 
 double hotUsage, coldUsage; // m3
-
-unsigned long debounceDelay = 50;    // the debounce time; increase if the output flickers
 
 /*
  * myInterrupt:
@@ -152,38 +118,4 @@ int main (void)
 	}
 
   return 0;
-}
-
-void debounceImpulse(void (*onImpulse)(void), unsigned int pin, bool *state, bool *lastButtonState, static long *lastDebounceTime) {
-  // read the state of the switch into a local variable:
-  bool reading = digitalRead(pin);
-
-  // check to see if you just pressed the button
-  // (i.e. the input went from LOW to HIGH), and you've waited long enough
-  // since the last press to ignore any noise:
-
-  // If the switch changed, due to noise or pressing:
-  if (reading != lastButtonState) {
-    // reset the debouncing timer
-    lastDebounceTime = millis();
-  }
-
-  if ((millis() - lastDebounceTime) > debounceDelay) {
-    // whatever the reading is at, it's been there for longer than the debounce
-    // delay, so take it as the actual current state:
-
-    // if the button state has changed:
-    if (reading != state) {
-      state = reading;
-
-      // only toggle the LED if the new button state is HIGH
-      if (state == HIGH) {
-        ledState = !ledState;
-        (*onImpulse)();
-      }
-    }
-  }
-
-  // save the reading. Next time through the loop, it'll be the lastButtonState:
-  lastButtonState = reading;
 }
