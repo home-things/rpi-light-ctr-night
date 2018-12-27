@@ -15,8 +15,8 @@
 
 //static volatile int globalCounter [8] ;
 
-unsigned int hotWPin = 0; // wiringpi id
-unsigned int coldWPin = 2; // wiringpi id
+static unsigned int hotWPin = 0; // wiringpi id
+static unsigned int coldWPin = 2; // wiringpi id
 
 double hotUsage, coldUsage; // m3
 
