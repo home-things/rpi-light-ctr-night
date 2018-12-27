@@ -15,8 +15,8 @@
 
 //static volatile int globalCounter [8] ;
 
-static int hotWPin = 0; // wiringpi id
-static int coldWPin = 2; // wiringpi id
+unsigned hotWPin = 0; // wiringpi id
+unsigned coldWPin = 2; // wiringpi id
 
 double hotUsage, coldUsage; // m3
 
@@ -47,7 +47,7 @@ void onHotIrq (void) {
   //digitalWrite(lightPin, digitalRead(pirSensPin));
   printTime();
   printf(" onHotIrq: %d\n", digitalRead(hotWPin));
-  debounceImpulse(onHotImpulse, hotWPin, state, lastButtonState, lastDebounceTime)
+  debounceImpulse(onHotImpulse, hotWPin, state, lastButtonState, lastDebounceTime);
 }
 
 void onColdImpulse (void) {
@@ -64,7 +64,7 @@ void onColdIrq (void) {
   //digitalWrite(lightPin, digitalRead(pirSensPin));
   printTime();
   printf(" onColdIrq: %d\n", digitalRead(coldWPin));
-  debounceImpulse(onColdImpulse, coldWPin, state, lastButtonState, lastDebounceTime)
+  debounceImpulse(onColdImpulse, coldWPin, state, lastButtonState, lastDebounceTime);
 }
 
 void loadUsage(double *hotUsage, double *coldUsage)
@@ -73,7 +73,7 @@ void loadUsage(double *hotUsage, double *coldUsage)
   if (!fp)
   {
     perror("Usage file opening failed");
-    exit EXIT_FAILURE;
+    exit(EXIT_FAILURE);
   }
 
   // int c;
@@ -85,7 +85,7 @@ void loadUsage(double *hotUsage, double *coldUsage)
   if (ferror(fp))
   {
     perror("I/O error when reading");
-    exit EXIT_FAILURE;
+    exit(EXIT_FAILURE);
   }
 
   fclose(fp);
