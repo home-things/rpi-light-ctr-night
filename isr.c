@@ -49,7 +49,7 @@ void onHotIrq (void)
   //digitalWrite(lightPin, digitalRead(pirSensPin));
   printTime();
   printf(" onHotIrq: %d\n", digitalRead(hotWPin));
-  debounceImpulse(onHotImpulse, hotWPin, state, lastButtonState, lastDebounceTime);
+  debounceImpulse(onHotImpulse, hotWPin, &state, &lastButtonState, &lastDebounceTime);
 }
 
 void onColdImpulse (void)
@@ -68,7 +68,7 @@ void onColdIrq (void)
   //digitalWrite(lightPin, digitalRead(pirSensPin));
   printTime();
   printf(" onColdIrq: %d\n", digitalRead(coldWPin));
-  debounceImpulse(onColdImpulse, coldWPin, state, lastButtonState, lastDebounceTime);
+  debounceImpulse(onColdImpulse, coldWPin, &state, &lastButtonState, &lastDebounceTime);
 }
 
 void loadUsage(double *hotUsage, double *coldUsage)
