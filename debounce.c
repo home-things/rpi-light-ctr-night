@@ -26,9 +26,9 @@ void debounceImpulse(void (*onImpulse)(void), unsigned int pin, bool_t *state, b
     // if the button state has changed:
     if (reading != *state)
     {
-      (*state = reading;
+      *state = reading;
 
-      // only toggle the LED if the new button (state is HIGH
+      // only toggle the LED if the new button state is HIGH
       if (*state == HIGH) (*onImpulse)();
     }
   }
