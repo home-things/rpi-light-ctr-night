@@ -1,17 +1,17 @@
-#digitalRead, wiringPiISR, pullUpDnControl, wiringPiSetup
+// digitalRead, wiringPiISR, pullUpDnControl, wiringPiSetup
 #include <wiringPi.h>
 
-#std
+// std
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <time.h>
 
-#? ? ?
+// ? ? ?
 #include <unistd.h>
 
-#dirname
+// dirname
 #include <libgen.h>
 
 #include "isr.h"
