@@ -1,3 +1,4 @@
+#include <wiringPi.h>
 #include "isr.h"
 unsigned long debounceDelay = 50; // the debounce time; increase if the output flickers
 
@@ -23,12 +24,12 @@ void debounceImpulse(void (*onImpulse)(void), unsigned int pin, bool_t *state, b
     // delay, so take it as the actual current state:
 
     // if the button state has changed:
-    if (reading != state)
+    if (reading != (*state)
     {
-      state = reading;
+      (*state = reading;
 
-      // only toggle the LED if the new button state is HIGH
-      if (state == HIGH) (*onImpulse)();
+      // only toggle the LED if the new button (state is HIGH
+      if ((*state == HIGH) (*onImpulse)();
     }
   }
 

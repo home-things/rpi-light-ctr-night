@@ -76,7 +76,7 @@ void loadUsage(double *hotUsage, double *coldUsage)
   FILE *fp = fopen("usage.txt", "r");
   if (!fp)
   {
-    perror("Usage file opening failed");
+    perror("File opening failed: usage.txt");
     exit(EXIT_FAILURE);
   }
 
