@@ -15,8 +15,6 @@
 
 //static volatile int globalCounter [8] ;
 
-typedef unsigned char bool;
-
 static int hotWPin = 0; // wiringpi id
 static int coldWPin = 2; // wiringpi id
 
@@ -41,8 +39,8 @@ void onHotImpulse(void)
   printf("onHotImpulse: %f\n", hotUsage);
 }
 void onHotIrq (void) {
-  static bool state; // the current reading from the input pin
-  static bool lastButtonState = LOW; // the previous reading from the input pin
+  static bool_t state; // the current reading from the input pin
+  static bool_t lastButtonState = LOW; // the previous reading from the input pin
   static unsigned long lastDebounceTime = 0; // the last time the output pin was toggled
 
   //++globalCounter [0] ;
@@ -58,8 +56,8 @@ void onColdImpulse (void) {
 }
 
 void onColdIrq (void) {
-  static bool state; // the current reading from the input pin
-  static bool lastButtonState = LOW; // the previous reading from the input pin
+  static bool_t state; // the current reading from the input pin
+  static bool_t lastButtonState = LOW; // the previous reading from the input pin
   static unsigned long lastDebounceTime = 0; // the last time the output pin was toggled
 
   //++globalCounter [0] ;
