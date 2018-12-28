@@ -5,10 +5,10 @@
 #include <wiringPi.h>
 
 // std
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
-#include <stdlib.h>
 #include <time.h>
 
 // sleep
@@ -66,9 +66,9 @@ void onHotIrq(void)
   static bool_t lastButtonState = LOW;       // the previous reading from the input pin
   static unsigned long lastDebounceTime = 0; // the last time the output pin was toggled
 
-  //++globalCounter [0] ;
-  //digitalWrite(lightPin, digitalRead(pirSensPin));
-  fprintf(stderr, " onHotIrq: %d\n", digitalRead(hotWPin));
+  char time_s[50];
+  getTime(time_s);
+  fprintf(stderr, " onHotIrq: %s %d\n", time_s, digitalRead(hotWPin));
   debounceImpulse(onHotImpulse, hotWPin, &state, &lastButtonState, &lastDebounceTime);
 }
 
@@ -85,9 +85,9 @@ void onColdIrq(void)
   static bool_t lastButtonState = LOW;       // the previous reading from the input pin
   static unsigned long lastDebounceTime = 0; // the last time the output pin was toggled
 
-  //++globalCounter [0] ;
-  //digitalWrite(lightPin, digitalRead(pirSensPin));
-  fprintf(stderr, " onColdIrq: %d\n", digitalRead(coldWPin));
+  char time_s[50];
+  getTime(time_s);
+  fprintf(stderr, "onColdIrq: %s %d\n", time_s, digitalRead(coldWPin));
   debounceImpulse(onColdImpulse, coldWPin, &state, &lastButtonState, &lastDebounceTime);
 }
 
@@ -125,10 +125,8 @@ int main(int argc, char *argv[])
   //printf (" Int on pin %d: Counter: %5d\n", pin, globalCounter [pin]) ;
   fprintf(stderr, "waiting...\n");
 
-  for (;;)
-  {
-    sleep(100000);
-  }
+  // nope. keep working. look to wiringPiISR that doing actual irq listening work
+  for (;;) sleep(60); // seconds
 
   return 0;
 }
