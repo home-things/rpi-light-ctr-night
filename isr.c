@@ -11,9 +11,6 @@
 // ? ? ?
 #include <unistd.h>
 
-// dirname
-#include <libgen.h>
-
 #include "isr.h"
 #include "debounce.h"
 
@@ -114,9 +111,8 @@ int main(int argc, char *argv[])
 {
   printf("%s\n", dirname(argv[0]));
 
-  char __path[300];
-  strcpy(__path, argv[0]);
-  char *__dirname = dirname(__path);
+  char __dirname[300];
+  strcpy(__dirname, argv[0]);
   loadUsage(__dirname, &hotUsage, &coldUsage);
 
   printTime();
