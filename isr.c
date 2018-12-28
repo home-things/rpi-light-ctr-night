@@ -103,6 +103,8 @@ void loadUsage(char *argv[], double *hot_usage, double *cold_usage)
 
 int main(int argc, char *argv[])
 {
+  setbuf(stdout, NULL); // disable buffering. write logs immediately for best reliability
+
   char __path[300];
   strcpy(__path, argv[0]);
   dirname(__path);
