@@ -1,7 +1,9 @@
 #include <wiringPi.h>
 #include <stdio.h>
 #include "isr.h"
-unsigned long debounceDelay = 50; // the debounce time; increase if the output flickers
+
+// the debounce time, seconds
+unsigned long debounceDelay = 1000;
 
 void debounceImpulse(void (*onImpulse)(void), unsigned int pin, bool_t *prevState, unsigned long *lastHighTime)
 {
