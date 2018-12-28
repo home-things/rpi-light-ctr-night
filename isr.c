@@ -27,6 +27,7 @@ static unsigned int hotWPin = 0;  // wiringpi id
 static unsigned int coldWPin = 2; // wiringpi id
 
 double hotUsage, coldUsage; // m3
+char __dirname[300];
 
 /*
  * myInterrupt:
@@ -44,6 +45,10 @@ void printTime(void)
 
 void writeUsage(double hotUsage, double coldUsage)
 {
+  char usagePath[300];
+  strcpy(usagePath, __dirname);
+  strcat(usagePath, "/usage.txt");
+
   FILE *fp = fopen(usagePath, "r");
   if (!fp)
   {
@@ -101,12 +106,12 @@ void onColdIrq(void)
   debounceImpulse(onColdImpulse, coldWPin, &state, &lastButtonState, &lastDebounceTime);
 }
 
-void loadUsage(char *__dirname, double *hotUsage, double *coldUsage)
+void loadUsage(double *hotUsage, double *coldUsage)
 {
   char usagePath[300];
   strcpy(usagePath, __dirname);
   strcat(usagePath, "/usage.txt");
-  printf("usagePath: %s\n", usagePath);
+
   FILE *fp = fopen(usagePath, "r");
   if (!fp)
   {
@@ -136,8 +141,9 @@ int main(int argc, char *argv[])
 {
   char __path[300];
   strcpy(__path, argv[0]);
-  char *__dirname = dirname(__path);
-  loadUsage(__dirname, &hotUsage, &coldUsage);
+  dirname(__path);
+  strcpy(__dirname, __path);
+  loadUsage(&hotUsage, &coldUsage);
 
   printTime();
   printf("wiringPiSetup\n");
