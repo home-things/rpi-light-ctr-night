@@ -92,7 +92,7 @@ void loadUsage(char *__dirname, double *hotUsage, double *coldUsage)
     exit(EXIT_FAILURE);
   }
 
-  fscanf(fp, "%lf %lf", *hotUsage, *coldUsage);
+  fscanf(fp, "%f %f", *hotUsage, *coldUsage);
   printf("hot: %f, cold: %f\n", *hotUsage, *coldUsage);
 
   if (ferror(fp))
