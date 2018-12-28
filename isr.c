@@ -1,3 +1,18 @@
+/* usage: isr $curHot $curCold >> water.log
+ * output format: yyyy-mm-ddThh:mm:ss d_hot d_cold
+**/
+
+/* inotify-tools:
+sudo apt install inotify-tools
+
+inotifywait -e close_write,moved_to,create -m . |
+while read -r directory events filename; do
+  if [ "$filename" = "water.log" ]; then
+    tail -n1 | xargs ./update
+  fi
+done
+*/
+
 // digitalRead, wiringPiISR, pullUpDnControl, wiringPiSetup
 #include <wiringPi.h>
 
@@ -26,7 +41,7 @@
 static unsigned int hotWPin = 0;  // wiringpi id
 static unsigned int coldWPin = 2; // wiringpi id
 
-double hotUsage, coldUsage; // m3
+double hot_usage, cold_usage; // m3
 char __dirname[300];
 
 /*
@@ -34,44 +49,28 @@ char __dirname[300];
  *********************************************************************************
  */
 
-void printTime(void)
+void getTime(char *buf)
 {
   time_t t = time(NULL);
   struct tm *tm = localtime(&t);
-  char s[64];
-  strftime(s, sizeof(s), "%c", tm);
-  printf("%s", s);
+  // char s[64];
+  // strftime(s, sizeof(s), "%c", tm);
+  // fprintf(stderr, "%s", s);
+  sprintf(buf, "%d-%d-%dT%d:%d:%d", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
 }
 
-void writeUsage(double hotUsage, double coldUsage)
+void writeUsage(double hot_usage, double cold_usage)
 {
-  char usagePath[300];
-  strcpy(usagePath, __dirname);
-  strcat(usagePath, "/usage.txt");
-
-  FILE *fp = fopen(usagePath, "r");
-  if (!fp)
-  {
-    perror("File opening failed: usage.txt");
-    exit(EXIT_FAILURE);
-  }
-
-  fprintf(fp, "%lf %lf", hotUsage, coldUsage);
-
-  if (ferror(fp))
-  {
-    perror("I/O error when reading");
-    exit(EXIT_FAILURE);
-  }
-
-  fclose(fp);
+  char time_s[50];
+  getTime(time_s);
+  printf("%s %f %f", time_s, hot_usage, cold_usage);
 }
 
 void onHotImpulse(void)
 {
-  hotUsage += 0.01;
-  printf("onHotImpulse: %f\n", hotUsage);
-  writeUsage(hotUsage, coldUsage);
+  hot_usage += 0.01;
+  fprintf(stderr, "onHotImpulse: %f\n", hot_usage);
+  writeUsage(hot_usage, cold_usage);
 }
 void onHotIrq(void)
 {
@@ -81,16 +80,15 @@ void onHotIrq(void)
 
   //++globalCounter [0] ;
   //digitalWrite(lightPin, digitalRead(pirSensPin));
-  printTime();
-  printf(" onHotIrq: %d\n", digitalRead(hotWPin));
+  fprintf(stderr, " onHotIrq: %d\n", digitalRead(hotWPin));
   debounceImpulse(onHotImpulse, hotWPin, &state, &lastButtonState, &lastDebounceTime);
 }
 
 void onColdImpulse(void)
 {
-  coldUsage += 0.01;
-  printf("onColdImpulse: %f\n", coldUsage);
-  writeUsage(hotUsage, coldUsage);
+  cold_usage += 0.01;
+  fprintf(stderr, "onColdImpulse: %f\n", cold_usage);
+  writeUsage(hot_usage, cold_usage);
 }
 
 void onColdIrq(void)
@@ -101,34 +99,14 @@ void onColdIrq(void)
 
   //++globalCounter [0] ;
   //digitalWrite(lightPin, digitalRead(pirSensPin));
-  printTime();
-  printf(" onColdIrq: %d\n", digitalRead(coldWPin));
+  fprintf(stderr, " onColdIrq: %d\n", digitalRead(coldWPin));
   debounceImpulse(onColdImpulse, coldWPin, &state, &lastButtonState, &lastDebounceTime);
 }
 
-void loadUsage(double *hotUsage, double *coldUsage)
+void loadUsage(char *argv[], double *hot_usage, double *cold_usage)
 {
-  char usagePath[300];
-  strcpy(usagePath, __dirname);
-  strcat(usagePath, "/usage.txt");
-
-  FILE *fp = fopen(usagePath, "r");
-  if (!fp)
-  {
-    perror("File opening failed: usage.txt");
-    exit(EXIT_FAILURE);
-  }
-
-  fscanf(fp, "%lf %lf", hotUsage, coldUsage);
-  printf("hot: %f, cold: %f\n", *hotUsage, *coldUsage);
-
-  if (ferror(fp))
-  {
-    perror("I/O error when reading");
-    exit(EXIT_FAILURE);
-  }
-
-  fclose(fp);
+  *hot_usage = atof_l(argv[1]);
+  *cold_usage = atof_l(argv[2]);
 }
 
 /*
@@ -143,21 +121,20 @@ int main(int argc, char *argv[])
   strcpy(__path, argv[0]);
   dirname(__path);
   strcpy(__dirname, __path);
-  loadUsage(&hotUsage, &coldUsage);
+  loadUsage(argv, &hot_usage, &cold_usage);
 
-  printTime();
-  printf("wiringPiSetup\n");
+  fprintf(stderr, "wiringPiSetup\n");
   wiringPiSetup();
 
   pullUpDnControl(coldWPin, PUD_DOWN);
   pullUpDnControl(hotWPin, PUD_DOWN);
 
-  printf("wiringPiISR...\n");
+  fprintf(stderr, "wiringPiISR...\n");
   wiringPiISR(hotWPin, INT_EDGE_FALLING, &onHotIrq);
   wiringPiISR(coldWPin, INT_EDGE_FALLING, &onColdIrq);
 
   //printf (" Int on pin %d: Counter: %5d\n", pin, globalCounter [pin]) ;
-  printf("waiting...\n");
+  fprintf(stderr, "waiting...\n");
 
   for (;;)
   {
