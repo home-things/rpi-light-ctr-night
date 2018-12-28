@@ -82,7 +82,8 @@ void onColdIrq(void)
 void loadUsage(char *__dirname, double *hotUsage, double *coldUsage)
 {
   char usagePath[300];
-  strcat(usagePath, __dirname, "/usage.txt");
+  strcpy(usagePath, __dirname);
+  strcat(usagePath, "/usage.txt");
   FILE *fp = fopen(usagePath, "r");
   if (!fp)
   {
