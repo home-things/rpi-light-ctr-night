@@ -62,14 +62,13 @@ void onHotImpulse(void)
 }
 void onHotIrq(void)
 {
-  static bool_t state = LOW;                 // the current reading from the input pin
-  static bool_t lastButtonState = LOW;       // the previous reading from the input pin
+  static bool_t prevState = LOW;       // the previous reading from the input pin
   static unsigned long lastDebounceTime = 0; // the last time the output pin was toggled
 
   char time_s[50];
   getTime(time_s);
   fprintf(stderr, " onHotIrq: %s %d\n", time_s, digitalRead(hotWPin));
-  debounceImpulse(onHotImpulse, hotWPin, &state, &lastButtonState, &lastDebounceTime);
+  debounceImpulse(onHotImpulse, hotWPin, &prevState, &lastDebounceTime);
 }
 
 void onColdImpulse(void)
@@ -81,14 +80,13 @@ void onColdImpulse(void)
 
 void onColdIrq(void)
 {
-  static bool_t state = LOW;                  // the current reading from the input pin
-  static bool_t lastButtonState = LOW;       // the previous reading from the input pin
+  static bool_t prevState = LOW;       // the previous reading from the input pin
   static unsigned long lastDebounceTime = 0; // the last time the output pin was toggled
 
   char time_s[50];
   getTime(time_s);
   fprintf(stderr, "onColdIrq: %s %d\n", time_s, digitalRead(coldWPin));
-  debounceImpulse(onColdImpulse, coldWPin, &state, &lastButtonState, &lastDebounceTime);
+  debounceImpulse(onColdImpulse, coldWPin, &prevState, &lastDebounceTime);
 }
 
 void loadUsage(char *argv[], double *hot_usage, double *cold_usage)
