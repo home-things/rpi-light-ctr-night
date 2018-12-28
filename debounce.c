@@ -14,7 +14,7 @@ void debounceImpulse(void (*onImpulse)(void), unsigned int pin, bool_t *prevStat
   // since the last press to ignore any noise:
 
   // If the switch changed, due to noise or pressing:
-  bool_t isFirstImpulse = !lastHighTime;
+  bool_t isFirstImpulse = !(*lastHighTime);
 
   fprintf(stderr, "isFirstImpulse: %d", isFirstImpulse);
 
@@ -23,7 +23,7 @@ void debounceImpulse(void (*onImpulse)(void), unsigned int pin, bool_t *prevStat
     if (state == HIGH) {
       // reset the debouncing timer
       *lastHighTime = millis();
-      fprintf(stderr, "state changed. time: %d", lastHighTime);
+      fprintf(stderr, "state changed. time: %lu", *lastHighTime);
     }
   }
 
@@ -32,12 +32,12 @@ void debounceImpulse(void (*onImpulse)(void), unsigned int pin, bool_t *prevStat
     // whatever the state is at, it's been there for longer than the debounce
     // delay, so take it as the actual current state:
 
-    fprintf(stderr, "enough time: %d", millis() - *lastHighTime);
+    fprintf(stderr, "enough time: %lu", millis() - *lastHighTime);
 
     // only toggle the LED if the new button state is HIGH
     (*onImpulse)();
   }
 
-  // save the state. Next time through the loop, it'll be the prevState:
+  // save the state. Next time through the loop, it'll be the *prevState:
   *prevState = state;
 }

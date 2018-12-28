@@ -27,7 +27,7 @@ SRC  := $(wildcard *.c)
 OBJS := $(SRC:.c=.o)
 BINS :=	$(SRC:.c=)
 
-all:		watch
+all:	watch
 
 #	@cat README.TXT
 #	@echo "    $(BINS)" | fmt
@@ -39,10 +39,10 @@ install:
 watch:	run
 	./watch
 
-run:		isr
-	tail -n1 water.log | xargs ./isr >> water.log
+run:	isr
+	./run
 
-isr:		$(OBJS)
+isr:	$(OBJS)
 	@echo [link] $^ '-->' $@
 	$(CC) $(OBJS) $(LDFLAGS) $(LDLIBS) -o $@
 
