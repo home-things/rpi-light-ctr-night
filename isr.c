@@ -11,9 +11,6 @@
 #include <stdlib.h>
 #include <time.h>
 
-// ? ? ?
-#include <unistd.h>
-
 // dirname
 #include <libgen.h>
 
@@ -110,7 +107,7 @@ int main(int argc, char *argv[])
   dirname(__path);
   strcpy(__dirname, __path);
   loadUsage(argv, &hot_usage, &cold_usage);
-  fprintf(stderr, "hot: %f; cold: %f", hot_usage, cold_usage);
+  fprintf(stderr, "hot: %f; cold: %f\n", hot_usage, cold_usage);
 
   fprintf(stderr, "wiringPiSetup\n");
   wiringPiSetup();
