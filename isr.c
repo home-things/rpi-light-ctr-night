@@ -56,7 +56,7 @@ void getTime(char *buf)
   // char s[64];
   // strftime(s, sizeof(s), "%c", tm);
   // fprintf(stderr, "%s", s);
-  sprintf(buf, "%d-%d-%dT%d:%d:%d", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
+  sprintf(buf, "%d-%d-%dT%d:%d:%d", tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday, tm->tm_hour, tm->tm_min, tm->tm_sec);
 }
 
 void writeUsage(double hot_usage, double cold_usage)
@@ -105,8 +105,8 @@ void onColdIrq(void)
 
 void loadUsage(char *argv[], double *hot_usage, double *cold_usage)
 {
-  *hot_usage = atof_l(argv[1]);
-  *cold_usage = atof_l(argv[2]);
+  *hot_usage = atof(argv[1]);
+  *cold_usage = atof(argv[2]);
 }
 
 /*
