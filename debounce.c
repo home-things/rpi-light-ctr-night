@@ -1,4 +1,5 @@
 #include <wiringPi.h>
+#include <stdio.h>
 #include "isr.h"
 unsigned long debounceDelay = 50; // the debounce time; increase if the output flickers
 
