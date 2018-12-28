@@ -27,14 +27,20 @@ SRC  := $(wildcard *.c)
 OBJS := $(SRC:.c=.o)
 BINS :=	$(SRC:.c=)
 
-all:		run
+all:		watch
 
 #	@cat README.TXT
 #	@echo "    $(BINS)" | fmt
 #	@echo ""
 
+install:
+	sudo apt install inotify-tools
+
+watch:	run
+	./watch
+
 run:		isr
-	tail -n1 water.log | xargs ./isr
+	tail -n1 water.log | xargs ./isr >> water.log
 
 isr:		$(OBJS)
 	@echo [link] $^ '-->' $@

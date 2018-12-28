@@ -1,19 +1,7 @@
-/* usage: tail -n1 water.log | xargs isr >> water.log
- * output format: yyyy-mm-ddThh:mm:ss d_hot d_cold
-**/
+// argv: d_hot, d_cold
+// output format: yyyy-mm-ddThh:mm:ss d_hot d_cold
 
-/* inotify-tools:
-sudo apt install inotify-tools
-
-inotifywait -e close_write,moved_to,create -m . |
-while read -r directory events filename; do
-  if [ "$filename" = "water.log" ]; then
-    tail -n1 water.log | xargs ./update
-  fi
-done
-*/
-
-// digitalRead, wiringPiISR, pullUpDnControl, wiringPiSetup
+// wiringPi: digitalRead, wiringPiISR, pullUpDnControl, wiringPiSetup
 #include <wiringPi.h>
 
 // std
