@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# usage: ./update 123.43 230.12
+
+hot=$1
+cold=$2
+date="$(date)"
+echo "hot: $hot; cold: $cold; date: $date"
+sed "s/%hot%/$hot/" roscha-water-tpl.html | sed "s/%cold%/$cold/" | sed "s/%date%/$date/" > roscha-water.html
+scp roscha-water.html root@invntrm.ru:/var/www/invntrm.ru/roscha/water.html
+
+# check the https://invntrm.ru/roscha/water.html
