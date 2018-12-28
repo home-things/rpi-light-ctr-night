@@ -63,7 +63,7 @@ void writeUsage(double hot_usage, double cold_usage)
 {
   char time_s[50];
   getTime(time_s);
-  printf("%s %f %f", time_s, hot_usage, cold_usage);
+  printf("%f %f %s", hot_usage, cold_usage, time_s);
 }
 
 void onHotImpulse(void)

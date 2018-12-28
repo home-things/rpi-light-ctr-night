@@ -34,7 +34,7 @@ all:		run
 #	@echo ""
 
 run:		isr
-	./isr
+	tail -n1 water.log | xargs ./isr
 
 isr:		$(OBJS)
 	@echo [link] $^ '-->' $@
