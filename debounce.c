@@ -18,14 +18,14 @@ void debounceImpulse(void (*onImpulse)(void), unsigned int pin, bool_t *prevStat
   // If the switch changed, due to noise or pressing:
   bool_t isFirstImpulse = !(*lastHighTime);
 
-  fprintf(stderr, "isFirstImpulse: %d\n", isFirstImpulse);
+  fprintf(stderr, "isFirstImpulse: %d; *lastHighTime: %lu\n", isFirstImpulse, *lastHighTime);
 
   if (state != *prevState || isFirstImpulse)
   {
     if (state == HIGH) {
       // reset the debouncing timer
       *lastHighTime = millis();
-      fprintf(stderr, "state changed. time: %lu\n", *lastHighTime);
+      fprintf(stderr, "state changed. time: %lu; state: %d\n", *lastHighTime, state);
     }
   }
 
