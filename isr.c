@@ -84,6 +84,7 @@ void loadUsage(char *__dirname, double *hotUsage, double *coldUsage)
   char usagePath[300];
   strcpy(usagePath, __dirname);
   strcat(usagePath, "/usage.txt");
+  printf("usagePath: %s\n", usagePath);
   FILE *fp = fopen(usagePath, "r");
   if (!fp)
   {
@@ -91,11 +92,8 @@ void loadUsage(char *__dirname, double *hotUsage, double *coldUsage)
     exit(EXIT_FAILURE);
   }
 
-  // int c;
-  // while ((c = fgetc(fp)) != EOF) {
-  //   putchar(c);
-  // }
   fscanf(fp, "%lf %lf", hotUsage, coldUsage);
+  printf("hot: %lf, cold: %lf\n", hotUsage, coldUsage);
 
   if (ferror(fp))
   {
