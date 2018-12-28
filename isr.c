@@ -67,7 +67,7 @@ void onHotIrq(void)
 
   char time_s[50];
   getTime(time_s);
-  fprintf(stderr, " onHotIrq: %s %d\n", time_s, digitalRead(hotWPin));
+  fprintf(stderr, "\nonHotIrq: %s %d\n", time_s, digitalRead(hotWPin));
   debounceImpulse(onHotImpulse, hotWPin, &prevState, &lastDebounceTime);
 }
 
@@ -85,7 +85,7 @@ void onColdIrq(void)
 
   char time_s[50];
   getTime(time_s);
-  fprintf(stderr, "onColdIrq: %s %d\n", time_s, digitalRead(coldWPin));
+  fprintf(stderr, "\nonColdIrq: %s %d\n", time_s, digitalRead(coldWPin));
   debounceImpulse(onColdImpulse, coldWPin, &prevState, &lastDebounceTime);
 }
 
