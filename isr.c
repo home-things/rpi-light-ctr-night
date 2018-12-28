@@ -1,4 +1,4 @@
-/* usage: isr $curHot $curCold >> water.log
+/* usage: tail -n1 water.log | xargs isr >> water.log
  * output format: yyyy-mm-ddThh:mm:ss d_hot d_cold
 **/
 
@@ -8,7 +8,7 @@ sudo apt install inotify-tools
 inotifywait -e close_write,moved_to,create -m . |
 while read -r directory events filename; do
   if [ "$filename" = "water.log" ]; then
-    tail -n1 | xargs ./update
+    tail -n1 water.log | xargs ./update
   fi
 done
 */
@@ -122,6 +122,7 @@ int main(int argc, char *argv[])
   dirname(__path);
   strcpy(__dirname, __path);
   loadUsage(argv, &hot_usage, &cold_usage);
+  fprintf(stderr, "hot: %f; cold: %f", hot_usage, cold_usage);
 
   fprintf(stderr, "wiringPiSetup\n");
   wiringPiSetup();
