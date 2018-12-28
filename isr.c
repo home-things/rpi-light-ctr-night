@@ -11,6 +11,9 @@
 // ? ? ?
 #include <unistd.h>
 
+// dirname
+#include <libgen.h>
+
 #include "isr.h"
 #include "debounce.h"
 
@@ -39,10 +42,31 @@ void printTime(void)
   printf("%s", s);
 }
 
+void writeUsage(double hotUsage, double coldUsage)
+{
+  FILE *fp = fopen(usagePath, "r");
+  if (!fp)
+  {
+    perror("File opening failed: usage.txt");
+    exit(EXIT_FAILURE);
+  }
+
+  fprintf(fp, "%lf %lf", hotUsage, coldUsage);
+
+  if (ferror(fp))
+  {
+    perror("I/O error when reading");
+    exit(EXIT_FAILURE);
+  }
+
+  fclose(fp);
+}
+
 void onHotImpulse(void)
 {
   hotUsage += 0.01;
   printf("onHotImpulse: %f\n", hotUsage);
+  writeUsage(hotUsage, coldUsage);
 }
 void onHotIrq(void)
 {
@@ -61,6 +85,7 @@ void onColdImpulse(void)
 {
   coldUsage += 0.01;
   printf("onColdImpulse: %f\n", coldUsage);
+  writeUsage(hotUsage, coldUsage);
 }
 
 void onColdIrq(void)
@@ -109,8 +134,9 @@ void loadUsage(char *__dirname, double *hotUsage, double *coldUsage)
 
 int main(int argc, char *argv[])
 {
-  char __dirname[300];
-  strcpy(__dirname, argv[0]);
+  char __path[300];
+  strcpy(__path, argv[0]);
+  char *__dirname = dirname(__path);
   loadUsage(__dirname, &hotUsage, &coldUsage);
 
   printTime();
