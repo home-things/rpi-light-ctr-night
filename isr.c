@@ -62,7 +62,7 @@ void onHotImpulse(void)
 }
 void onHotIrq(void)
 {
-  static bool_t state;                       // the current reading from the input pin
+  static bool_t state = LOW;                 // the current reading from the input pin
   static bool_t lastButtonState = LOW;       // the previous reading from the input pin
   static unsigned long lastDebounceTime = 0; // the last time the output pin was toggled
 
@@ -81,7 +81,7 @@ void onColdImpulse(void)
 
 void onColdIrq(void)
 {
-  static bool_t state;                       // the current reading from the input pin
+  static bool_t state = LOW;                  // the current reading from the input pin
   static bool_t lastButtonState = LOW;       // the previous reading from the input pin
   static unsigned long lastDebounceTime = 0; // the last time the output pin was toggled
 

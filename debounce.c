@@ -12,24 +12,28 @@ void debounceImpulse(void (*onImpulse)(void), unsigned int pin, bool_t *state, b
   // since the last press to ignore any noise:
 
   // If the switch changed, due to noise or pressing:
-  if (reading != *lastButtonState)
+  bool_t isFirstImpulse = !lastDebounceTime;
+
+  if (reading != HIGH) return;
+
+  if (reading != *lastButtonState || isFirstImpulse)
   {
     // reset the debouncing timer
     *lastDebounceTime = millis();
   }
 
-  if ((millis() - *lastDebounceTime) > debounceDelay)
+  if ((millis() - *lastDebounceTime) > debounceDelay || isFirstImpulse)
   {
     // whatever the reading is at, it's been there for longer than the debounce
     // delay, so take it as the actual current state:
 
     // if the button state has changed:
-    if (reading != *state)
+    if (reading != *state || isFirstImpulse)
     {
       *state = reading;
 
       // only toggle the LED if the new button state is HIGH
-      if (*state == HIGH) (*onImpulse)();
+      (*onImpulse)();
     }
   }
 
