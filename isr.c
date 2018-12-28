@@ -109,8 +109,6 @@ void loadUsage(char *__dirname, double *hotUsage, double *coldUsage)
 
 int main(int argc, char *argv[])
 {
-  printf("%s\n", dirname(argv[0]));
-
   char __dirname[300];
   strcpy(__dirname, argv[0]);
   loadUsage(__dirname, &hotUsage, &coldUsage);
