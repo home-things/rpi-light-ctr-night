@@ -9,7 +9,7 @@
 # $+: similar to $^, but includes duplicates.
 # $?: the names of all prerequisites that are newer than the target, separated by spaces.
 
-.PHONY : all clean
+.PHONY : all clean update cron-update install watch run
 
 #DEBUG	= -ggdb -O0 -v
 DEBUG	  = -O3
@@ -36,10 +36,11 @@ all:	run
 install:
 	sudo apt install inotify-tools
 
-watch:
-	./watch
+#watch:
+#	./watch
 
-cron-update:
+cron-update: update
+update:
 	tail -n1 water.log | xargs ./update
 
 run:	isr

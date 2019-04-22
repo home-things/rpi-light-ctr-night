@@ -2,6 +2,9 @@
 // output format: yyyy-mm-ddThh:mm:ss d_hot d_cold
 
 // wiringPi: digitalRead, wiringPiISR, pullUpDnControl, wiringPiSetup
+
+// todo: use seconds instead of millis, check max uptime
+
 #include <wiringPi.h>
 
 // std
@@ -56,7 +59,7 @@ void writeUsage(double hot_usage, double cold_usage)
 
 void onHotImpulse(void)
 {
-  hot_usage += 0.01;
+  hot_usage += 1;
   fprintf(stderr, "onHotImpulse: %f\n", hot_usage);
   writeUsage(hot_usage, cold_usage);
 }
