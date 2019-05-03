@@ -39,10 +39,6 @@ install:
 #watch:
 #	./watch
 
-cron-update: update
-update:
-	tail -n1 water.log | xargs ./update
-
 run:	isr
 	./run
 
