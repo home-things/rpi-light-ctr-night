@@ -1,4 +1,4 @@
-# water-isr
-Water-meter w/o electronic impulse output consumer w/ interruptions for rpi
+# rpi-light-ctr
+Yet another light controller for raspberry pi. ISR Interruptons. C 
 
-Hub repo: https://github.com/a-x-/tg-rpi-smart-home-bot
+Hub repo: [homeblin/rpi-tg-bot](https://github.com/homeblin/rpi-tg-bot)
