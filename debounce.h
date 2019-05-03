@@ -3,6 +3,6 @@
 void debounceImpulse(
   void (*onImpulse)(void),
   unsigned int pin,
-  bool_t *prevState,
+  bool *prevState,
   unsigned long *lastHighTime
 );

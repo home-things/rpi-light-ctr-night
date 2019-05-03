@@ -5,10 +5,10 @@
 // the debounce time, seconds
 unsigned long debounceDelay = 1000;
 
-void debounceImpulse(void (*onImpulse)(void), unsigned int pin, bool_t *prevState, unsigned long *lastHighTime)
+void debounceImpulse(void (*onImpulse)(void), unsigned int pin, bool *prevState, unsigned long *lastHighTime)
 {
   // read the state of the switch into a local variable:
-  bool_t state = digitalRead(pin);
+  bool state = digitalRead(pin);
   fprintf(stderr, "state: %d\n", state);
 
   // check to see if you just pressed the button

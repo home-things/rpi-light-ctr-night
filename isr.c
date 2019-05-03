@@ -3,8 +3,6 @@
 
 // wiringPi: digitalRead, wiringPiISR, pullUpDnControl, wiringPiSetup
 
-// todo: use seconds instead of millis, check max uptime
-
 #include <wiringPi.h>
 
 // std
@@ -23,80 +21,115 @@
 #include "isr.h"
 #include "debounce.h"
 
+#include <cJSON/cJSON.h>
+
 // globalCounter:
 //	Global variable to count interrupts
 //	Should be declared volatile to make sure the compiler doesn't cache it.
 
 //static volatile int globalCounter [8] ;
 
-static unsigned int hotWPin = 0;  // wiringpi id
-static unsigned int coldWPin = 2; // wiringpi id
+static unsigned int kitchPirS = 15;  // wiringpi id; phisical: 8
+static unsigned int kitchRelay = 3;  // wiringpi id; phisical: 15
 
-double hot_usage, cold_usage; // m3
-char __dirname[300];
+int lastMovingTime = 0; // sec
+bool isLightOn = false;
+bool prevMoving = false;
+unsigned long startedAt = NULL; // sec, since 1970 aka epoch
+const unsigned HOUR = 24 * 60; // sec
+const unsigned MIN = 60; // sec
 
-/*
- * myInterrupt:
- *********************************************************************************
- */
+void print_debug (const char* str) {
+  fprintf(stderr, str);
+}
 
-void getTime(char *buf)
-{
+bool hasMoving(void) {
+  return digitalRead(kitchPirS);
+}
+
+time_t seconds () {
+  return time(NULL);
+}
+
+
+bool toggleLight (bool isOn) {
+  if (isLightOn == isOn) return isOn;
+  fprintf(stderr, "effective toggle light. current: %d / request: %d\n", isLightOn, isOn);
+  system("mpg321 ./beep.mp3");
+  digitalWrite(kitchRelay, isOn);
+  isLightOn = isOn;
+  return isLightOn;
+}
+
+// get time in seconds
+unsigned getSunse () {
+  fprintf(stderr, "json...\n");
+  //system("curl --get --include 'https://sun.p.rapidapi.com/api/sun/?latitude=55.797447&longitude=37.607969&date=2019-05-27' \
+		    //-H 'X-RapidAPI-Host: sun.p.rapidapi.com' \
+		      //-H 'X-RapidAPI-Key: eb17b3b315msh1feb8f4a6f34475p117f34jsnf8487dd7ab50'");
+  // system() with stdout
+  FILE *lsofFile_p = popen("curl", "--get", "--include", 
+	"https://sun.p.rapidapi.com/api/sun/?latitude=55.797447&longitude=37.607969&date=2019-05-27",
+	"-H", "X-RapidAPI-Host: sun.p.rapidapi.com",
+	"-H", "X-RapidAPI-Key: eb17b3b315msh1feb8f4a6f34475p117f34jsnf8487dd7ab50");
+
+  if (!lsofFile_p) return -1;
+
+  char buffer[1024];
+  char *line_p = fgets(buffer, sizeof(buffer), lsofFile_p);
+  pclose(lsofFile_p);
+
+  printf("json: %s\n", buffer);
+  //cJSON *json = cJSON_Parse(buffer);
+  //printf("%s", json);
+  return 42;
+}
+
+bool getEveningTime () {
   time_t t = time(NULL);
-  struct tm *tm = localtime(&t);
-  // char s[64];
-  // strftime(s, sizeof(s), "%c", tm);
-  // fprintf(stderr, "%s", s);
-  sprintf(buf, "%d-%d-%dT%d:%d:%d", tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday, tm->tm_hour, tm->tm_min, tm->tm_sec);
+  struct tm* lt = localtime(&t);
+  const unsigned char hour = lt->tm_hour + 3;
+  const bool yes = hour >= 18 || hour <= 2;
+  print_debug("hour: ");
+  fprintf(stderr, "%d\n", hour); // print_debug
+
+  return yes;
 }
 
-void writeUsage(double hot_usage, double cold_usage)
-{
-  char time_s[50];
-  getTime(time_s);
-  printf("%f %f %s\n", hot_usage, cold_usage, time_s);
+void onMove (void) {
+  print_debug("> moving <\n");
+  toggleLight((bool)getEveningTime());
+
+  if (!getEveningTime()) print_debug("\nNot the evening time --> No light\n");
+
+  lastMovingTime = seconds();
+}
+void checkDelay (void) {
+  bool shouldBeLight = seconds() - lastMovingTime <= 25 * MIN;
+  fprintf(stderr, "check: seconds: %ld / diff: %ld\n", seconds(), seconds() - lastMovingTime);
+  if (!shouldBeLight) print_debug("moving timeout --> turn light off\n");
+  toggleLight(getEveningTime() && shouldBeLight);
 }
 
-void onHotImpulse(void)
-{
-  hot_usage += 1;
-  fprintf(stderr, "onHotImpulse: %f\n", hot_usage);
-  writeUsage(hot_usage, cold_usage);
-}
-void onHotIrq(void)
-{
-  static bool_t prevState = LOW;       // the previous reading from the input pin
-  static unsigned long lastDebounceTime = 0; // the last time the output pin was toggled
+void setupPins () {
+  //pinMode(kitchPirS, INPUT);
+  //pinMode(kitchRelay, OUTPUT);
+  //pullUpDnControl(kitchPirS, PUD_DOWN); // out
 
-  char time_s[50];
-  getTime(time_s);
-  fprintf(stderr, "\nonHotIrq: %s %d\n", time_s, digitalRead(hotWPin));
-  debounceImpulse(onHotImpulse, hotWPin, &prevState, &lastDebounceTime);
+  print_debug("wiringPiSetup\n");
+  wiringPiSetup();
+
+  print_debug("wiringPiISR...\n");
+  wiringPiISR(kitchPirS, INT_EDGE_RISING, &onMove); // in
+
+  isLightOn = digitalRead(kitchRelay);
+  print_debug(isLightOn ? "init: light is on\n" : "init: light is off\n");
 }
 
-void onColdImpulse(void)
-{
-  cold_usage += 0.01;
-  fprintf(stderr, "onColdImpulse: %f\n", cold_usage);
-  writeUsage(hot_usage, cold_usage);
-}
-
-void onColdIrq(void)
-{
-  static bool_t prevState = LOW;       // the previous reading from the input pin
-  static unsigned long lastDebounceTime = 0; // the last time the output pin was toggled
-
-  char time_s[50];
-  getTime(time_s);
-  fprintf(stderr, "\nonColdIrq: %s %d\n", time_s, digitalRead(coldWPin));
-  debounceImpulse(onColdImpulse, coldWPin, &prevState, &lastDebounceTime);
-}
-
-void loadUsage(char *argv[], double *hot_usage, double *cold_usage)
-{
-  *hot_usage = atof(argv[1]);
-  *cold_usage = atof(argv[2]);
-}
+ // // @returns epoch secs
+ // unsigned long getTimestamp () {
+ //   return startedAt + seconds();
+ // }
 
 /*
  *********************************************************************************
@@ -107,29 +140,22 @@ void loadUsage(char *argv[], double *hot_usage, double *cold_usage)
 int main(int argc, char *argv[])
 {
   setbuf(stdout, NULL); // disable buffering. write logs immediately for best reliability
+  setbuf(stderr, NULL); // disable buffering. write logs immediately for best reliability
 
-  char __path[300];
-  strcpy(__path, argv[0]);
-  dirname(__path);
-  strcpy(__dirname, __path);
-  loadUsage(argv, &hot_usage, &cold_usage);
-  fprintf(stderr, "hot: %f; cold: %f\n", hot_usage, cold_usage);
+  getSunse();
+  exit(0);
 
-  fprintf(stderr, "wiringPiSetup\n");
-  wiringPiSetup();
+  setupPins();
 
-  pullUpDnControl(coldWPin, PUD_DOWN);
-  pullUpDnControl(hotWPin, PUD_DOWN);
-
-  fprintf(stderr, "wiringPiISR...\n");
-  wiringPiISR(hotWPin, INT_EDGE_FALLING, &onHotIrq);
-  wiringPiISR(coldWPin, INT_EDGE_FALLING, &onColdIrq);
 
   //printf (" Int on pin %d: Counter: %5d\n", pin, globalCounter [pin]) ;
-  fprintf(stderr, "waiting...\n");
+  print_debug("waiting...\n");
 
   // nope. keep working. look to wiringPiISR that doing actual irq listening work
-  for (;;) sleep(60); // seconds
+  for (;;) {
+    checkDelay();
+    sleep(15); // seconds
+  }
 
   return 0;
 }
