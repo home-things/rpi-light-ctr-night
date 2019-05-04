@@ -20,6 +20,8 @@
 
 #include "isr.h"
 #include "debounce.h"
+#include "rest.h"
+#include "cJSON/cJSON.h"
 
 #include <cJSON/cJSON.h>
 
@@ -29,31 +31,35 @@
 
 //static volatile int globalCounter [8] ;
 
-static unsigned int kitchPirS = 15;  // wiringpi id; phisical: 8
-static unsigned int kitchRelay = 3;  // wiringpi id; phisical: 15
+static unsigned int kitchPirS = 15; // wiringpi id; phisical: 8
+static unsigned int kitchRelay = 3; // wiringpi id; phisical: 15
 
 int lastMovingTime = 0; // sec
 bool isLightOn = false;
 bool prevMoving = false;
 unsigned long startedAt = NULL; // sec, since 1970 aka epoch
-const unsigned HOUR = 24 * 60; // sec
-const unsigned MIN = 60; // sec
+const unsigned HOUR = 24 * 60;  // sec
+const unsigned MIN = 60;        // sec
 
-void print_debug (const char* str) {
+void print_debug(const char *str)
+{
   fprintf(stderr, str);
 }
 
-bool hasMoving(void) {
+bool hasMoving(void)
+{
   return digitalRead(kitchPirS);
 }
 
-time_t seconds () {
+time_t seconds()
+{
   return time(NULL);
 }
 
-
-bool toggleLight (bool isOn) {
-  if (isLightOn == isOn) return isOn;
+bool toggleLight(bool isOn)
+{
+  if (isLightOn == isOn)
+    return isOn;
   fprintf(stderr, "effective toggle light. current: %d / request: %d\n", isLightOn, isOn);
   system("mpg321 ./beep.mp3");
   digitalWrite(kitchRelay, isOn);
@@ -62,24 +68,13 @@ bool toggleLight (bool isOn) {
 }
 
 // get time in seconds
-unsigned getSunse () {
+unsigned getSunset()
+{
   fprintf(stderr, "json...\n");
-  //system("curl --get --include 'https://sun.p.rapidapi.com/api/sun/?latitude=55.797447&longitude=37.607969&date=2019-05-27' \
-		    //-H 'X-RapidAPI-Host: sun.p.rapidapi.com' \
-		      //-H 'X-RapidAPI-Key: eb17b3b315msh1feb8f4a6f34475p117f34jsnf8487dd7ab50'");
-  // system() with stdout
-  FILE *lsofFile_p = popen("curl", "--get", "--include", 
-	"https://sun.p.rapidapi.com/api/sun/?latitude=55.797447&longitude=37.607969&date=2019-05-27",
-	"-H", "X-RapidAPI-Host: sun.p.rapidapi.com",
-	"-H", "X-RapidAPI-Key: eb17b3b315msh1feb8f4a6f34475p117f34jsnf8487dd7ab50");
+  const char *headers = "X-RapidAPI-Host: sun.p.rapidapi.com\nX-RapidAPI-Key: eb17b3b315msh1feb8f4a6f34475p117f34jsnf8487dd7ab50";
+  http_get("sun.p.rapidapi.com", "/api/sun/?latitude=55.797447&longitude=37.607969&date=2019-05-27", headers);
 
-  if (!lsofFile_p) return -1;
-
-  char buffer[1024];
-  char *line_p = fgets(buffer, sizeof(buffer), lsofFile_p);
-  pclose(lsofFile_p);
-
-  printf("json: %s\n", buffer);
+  // printf("json: %s\n", buffer);
   //cJSON *json = cJSON_Parse(buffer);
   //printf("%s", json);
   return 42;
@@ -126,10 +121,10 @@ void setupPins () {
   print_debug(isLightOn ? "init: light is on\n" : "init: light is off\n");
 }
 
- // // @returns epoch secs
- // unsigned long getTimestamp () {
- //   return startedAt + seconds();
- // }
+// // @returns epoch secs
+// unsigned long getTimestamp () {
+//   return startedAt + seconds();
+// }
 
 /*
  *********************************************************************************
@@ -142,17 +137,17 @@ int main(int argc, char *argv[])
   setbuf(stdout, NULL); // disable buffering. write logs immediately for best reliability
   setbuf(stderr, NULL); // disable buffering. write logs immediately for best reliability
 
-  getSunse();
+  getSunset();
   exit(0);
 
   setupPins();
-
 
   //printf (" Int on pin %d: Counter: %5d\n", pin, globalCounter [pin]) ;
   print_debug("waiting...\n");
 
   // nope. keep working. look to wiringPiISR that doing actual irq listening work
-  for (;;) {
+  for (;;)
+  {
     checkDelay();
     sleep(15); // seconds
   }
