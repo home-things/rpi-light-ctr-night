@@ -18,7 +18,7 @@ INCLUDE	= -I/usr/local/include -I.
 CFLAGS	= -c -std=c99 $(DEBUG) -Wall $(INCLUDE) -Winline -pipe
 
 LDFLAGS	= -L/usr/local/lib
-LDLIBS  = -lwiringPi -lwiringPiDev -lpthread -lm -lcrypt -lrt
+LDLIBS  = -lpthread -lm -lwiringPi -lwiringPiDev # -lssl -lrt -lcrypt -lwiringPi -lwiringPiDev
 
 # Should not alter anything below this line
 ###############################################################################

@@ -2,7 +2,6 @@
 // output format: yyyy-mm-ddThh:mm:ss d_hot d_cold
 
 // wiringPi: digitalRead, wiringPiISR, pullUpDnControl, wiringPiSetup
-
 #include <wiringPi.h>
 
 // std
@@ -23,7 +22,9 @@
 #include "rest.h"
 #include "cJSON/cJSON.h"
 
-#include <cJSON/cJSON.h>
+#define EVENING_FROM 20 /* hours */
+#define EVENING_UPTO 2  /* hours, must be >= 0 */
+#define DURATION 20     /* minutes, how long to be light since latest movement */
 
 // globalCounter:
 //	Global variable to count interrupts
@@ -40,6 +41,19 @@ bool prevMoving = false;
 unsigned long startedAt = NULL; // sec, since 1970 aka epoch
 const unsigned HOUR = 24 * 60;  // sec
 const unsigned MIN = 60;        // sec
+
+// // get time in seconds
+// unsigned getSunset()
+// {
+//   fprintf(stderr, "json...\n");
+//   const char *headers = "X-RapidAPI-Host: sun.p.rapidapi.com\nX-RapidAPI-Key: eb17b3b315msh1feb8f4a6f34475p117f34jsnf8487dd7ab50";
+//   http_get("sun.p.rapidapi.com", "/api/sun/?latitude=55.797447&longitude=37.607969&date=2019-05-27", headers);
+
+//   // printf("json: %s\n", buffer);
+//   //cJSON *json = cJSON_Parse(buffer);
+//   //printf("%s", json);
+//   return 42;
+// }
 
 void print_debug(const char *str)
 {
@@ -67,46 +81,38 @@ bool toggleLight(bool isOn)
   return isLightOn;
 }
 
-// get time in seconds
-unsigned getSunset()
+bool getEveningTime()
 {
-  fprintf(stderr, "json...\n");
-  const char *headers = "X-RapidAPI-Host: sun.p.rapidapi.com\nX-RapidAPI-Key: eb17b3b315msh1feb8f4a6f34475p117f34jsnf8487dd7ab50";
-  http_get("sun.p.rapidapi.com", "/api/sun/?latitude=55.797447&longitude=37.607969&date=2019-05-27", headers);
-
-  // printf("json: %s\n", buffer);
-  //cJSON *json = cJSON_Parse(buffer);
-  //printf("%s", json);
-  return 42;
-}
-
-bool getEveningTime () {
   time_t t = time(NULL);
-  struct tm* lt = localtime(&t);
+  struct tm *lt = localtime(&t);
   const unsigned char hour = lt->tm_hour + 3;
-  const bool yes = hour >= 18 || hour <= 2;
+  const bool yes = hour >= EVENING_FROM || hour <= EVENING_UPTO;
   print_debug("hour: ");
   fprintf(stderr, "%d\n", hour); // print_debug
 
   return yes;
 }
-
-void onMove (void) {
+void onMove(void)
+{
   print_debug("> moving <\n");
   toggleLight((bool)getEveningTime());
 
-  if (!getEveningTime()) print_debug("\nNot the evening time --> No light\n");
+  if (!getEveningTime())
+    print_debug("\nNot the evening time --> No light\n");
 
   lastMovingTime = seconds();
 }
-void checkDelay (void) {
-  bool shouldBeLight = seconds() - lastMovingTime <= 25 * MIN;
+void checkDelay(void)
+{
+  bool shouldBeLight = seconds() - lastMovingTime <= DURATION * MIN;
   fprintf(stderr, "check: seconds: %ld / diff: %ld\n", seconds(), seconds() - lastMovingTime);
-  if (!shouldBeLight) print_debug("moving timeout --> turn light off\n");
+  if (!shouldBeLight)
+    print_debug("moving timeout --> turn light off\n");
   toggleLight(getEveningTime() && shouldBeLight);
 }
 
-void setupPins () {
+void setupPins()
+{
   //pinMode(kitchPirS, INPUT);
   //pinMode(kitchRelay, OUTPUT);
   //pullUpDnControl(kitchPirS, PUD_DOWN); // out
@@ -137,9 +143,7 @@ int main(int argc, char *argv[])
   setbuf(stdout, NULL); // disable buffering. write logs immediately for best reliability
   setbuf(stderr, NULL); // disable buffering. write logs immediately for best reliability
 
-  getSunset();
   exit(0);
-
   setupPins();
 
   //printf (" Int on pin %d: Counter: %5d\n", pin, globalCounter [pin]) ;
