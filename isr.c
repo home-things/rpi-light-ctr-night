@@ -38,7 +38,7 @@ static unsigned int kitchRelay = 3; // wiringpi id; phisical: 15
 int lastMovingTime = 0; // sec
 bool isLightOn = false;
 bool prevMoving = false;
-unsigned long startedAt = NULL; // sec, since 1970 aka epoch
+unsigned long startedAt = null; // sec, since 1970 aka epoch
 const unsigned HOUR = 24 * 60;  // sec
 const unsigned MIN = 60;        // sec
 
@@ -143,7 +143,6 @@ int main(int argc, char *argv[])
   setbuf(stdout, NULL); // disable buffering. write logs immediately for best reliability
   setbuf(stderr, NULL); // disable buffering. write logs immediately for best reliability
 
-  exit(0);
   setupPins();
 
   //printf (" Int on pin %d: Counter: %5d\n", pin, globalCounter [pin]) ;
