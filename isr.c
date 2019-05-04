@@ -55,9 +55,31 @@ const unsigned MIN = 60;        // sec
 //   return 42;
 // }
 
+void int_str(int i, char *s)
+{
+  sprintf(s, "%d", i);
+}
+
+void date_time_str(char *result_str)
+{
+  time_t t = time(NULL);
+  struct tm *lt = localtime(&t);
+  const unsigned int hour = lt->tm_hour + 3, min = lt->tm_min;
+  char hour_s[10] = "", min_s[10] = "";
+  int_str(hour, hour_s), int_str(min, min_s);
+  strcat(result_str, hour_s), strcat(result_str, ":"), strcat(result_str, min_s);
+}
+
 void print_debug(const char *str)
 {
-  fprintf(stderr, str);
+  char buf[2048] = "";
+  char date_time[40] = "";
+  date_time_str(date_time);
+
+  strcat(buf, date_time);
+  strcat(buf, ": ");
+  strcat(buf, str);
+  fprintf(stderr, buf);
 }
 
 bool hasMoving(void)
@@ -98,7 +120,7 @@ void onMove(void)
   toggleLight((bool)getEveningTime());
 
   if (!getEveningTime())
-    print_debug("\nNot the evening time --> No light\n");
+    print_debug("Not the evening time --> No light\n");
 
   lastMovingTime = seconds();
 }
