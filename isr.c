@@ -32,8 +32,8 @@
 
 //static volatile int globalCounter [8] ;
 
-static unsigned int kitchPirS = 15; // wiringpi id; phisical: 8
-static unsigned int kitchRelay = 3; // wiringpi id; phisical: 15
+static unsigned int pirS = 15; // wiringpi id; phisical: 8
+static unsigned int nightLed = 3; // wiringpi id; phisical: 15
 
 int lastMovingTime = 0; // sec
 bool isLightOn = false;
@@ -84,7 +84,7 @@ void print_debug(const char *str)
 
 bool hasMoving(void)
 {
-  return digitalRead(kitchPirS);
+  return digitalRead(pirS);
 }
 
 time_t seconds()
@@ -98,7 +98,7 @@ bool toggleLight(bool isOn)
     return isOn;
   fprintf(stderr, "effective toggle light. current: %d / request: %d\n", isLightOn, isOn);
   system("mpg321 ./beep.mp3");
-  digitalWrite(kitchRelay, isOn);
+  digitalWrite(nightLed, isOn);
   isLightOn = isOn;
   return isLightOn;
 }
@@ -135,17 +135,17 @@ void checkDelay(void)
 
 void setupPins()
 {
-  //pinMode(kitchPirS, INPUT);
-  //pinMode(kitchRelay, OUTPUT);
-  //pullUpDnControl(kitchPirS, PUD_DOWN); // out
+  //pinMode(pirS, INPUT);
+  //pinMode(nightLed, OUTPUT);
+  //pullUpDnControl(pirS, PUD_DOWN); // out
 
   print_debug("wiringPiSetup\n");
   wiringPiSetup();
 
   print_debug("wiringPiISR...\n");
-  wiringPiISR(kitchPirS, INT_EDGE_RISING, &onMove); // in
+  wiringPiISR(pirS, INT_EDGE_RISING, &onMove); // in
 
-  isLightOn = digitalRead(kitchRelay);
+  isLightOn = digitalRead(nightLed);
   print_debug(isLightOn ? "init: light is on\n" : "init: light is off\n");
 }
 
