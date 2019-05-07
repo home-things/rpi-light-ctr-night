@@ -20,11 +20,8 @@
 #include "isr.h"
 #include "debounce.h"
 #include "rest.h"
-#include "cJSON/cJSON.h"
 
-#define EVENING_FROM 20 /* hours */
-#define EVENING_UPTO 2  /* hours, must be >= 0 */
-#define DURATION 20     /* minutes, how long to be light since latest movement */
+#define DURATION 25 /* minutes, how long to be light since latest movement */
 
 // globalCounter:
 //	Global variable to count interrupts
@@ -32,8 +29,8 @@
 
 //static volatile int globalCounter [8] ;
 
-static unsigned int pirS = 15; // wiringpi id; phisical: 8
-static unsigned int nightLed = 3; // wiringpi id; phisical: 15
+static unsigned int pirS = 21;     // wiringpi id; bcm: 5
+static unsigned int nightLed = 23; // wiringpi id; bcm: 13
 
 int lastMovingTime = 0; // sec
 bool isLightOn = false;
@@ -103,25 +100,10 @@ bool toggleLight(bool isOn)
   return isLightOn;
 }
 
-bool getEveningTime()
-{
-  time_t t = time(NULL);
-  struct tm *lt = localtime(&t);
-  const unsigned char hour = lt->tm_hour + 3;
-  const bool yes = hour >= EVENING_FROM || hour <= EVENING_UPTO;
-  print_debug("hour: ");
-  fprintf(stderr, "%d\n", hour); // print_debug
-
-  return yes;
-}
 void onMove(void)
 {
   print_debug("> moving <\n");
-  toggleLight((bool)getEveningTime());
-
-  if (!getEveningTime())
-    print_debug("Not the evening time --> No light\n");
-
+  toggleLight(HIGH);
   lastMovingTime = seconds();
 }
 void checkDelay(void)
@@ -130,7 +112,7 @@ void checkDelay(void)
   fprintf(stderr, "check: seconds: %ld / diff: %ld\n", seconds(), seconds() - lastMovingTime);
   if (!shouldBeLight)
     print_debug("moving timeout --> turn light off\n");
-  toggleLight(getEveningTime() && shouldBeLight);
+  toggleLight(shouldBeLight);
 }
 
 void setupPins()
