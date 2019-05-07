@@ -32,7 +32,7 @@
 static unsigned int pirS = 21;     // wiringpi id; bcm: 5
 static unsigned int nightLed = 23; // wiringpi id; bcm: 13
 
-int lastMovingTime = 0; // sec
+int lastMovingTime = null; // sec
 bool isLightOn = false;
 bool prevMoving = false;
 unsigned long startedAt = null; // sec, since 1970 aka epoch
@@ -108,7 +108,7 @@ void onMove(void)
 }
 void checkDelay(void)
 {
-  bool shouldBeLight = seconds() - lastMovingTime <= DURATION * MIN;
+  bool shouldBeLight = lastMovingTime && seconds() - lastMovingTime <= DURATION * MIN;
   fprintf(stderr, "check: seconds: %ld / diff: %ld\n", seconds(), seconds() - lastMovingTime);
   if (!shouldBeLight)
     print_debug("moving timeout --> turn light off\n");
